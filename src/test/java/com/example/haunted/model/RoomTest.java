@@ -198,7 +198,7 @@ public class RoomTest {
 	@Test
 	public void invalidShouldNotBeFound()
 	{
-		assertEquals(null, room.findItem("Ghost item"));
+		assertTrue(room.findItem("Ghost item").isEmpty());
 	}
 	
 	@Test
@@ -316,9 +316,9 @@ public class RoomTest {
 	@Test
 	public void shouldNotUnlock()
 	{
-		room.setLocked(true, room.getRequiredKeyName());
+		room.setLocked(true, "Master Key");
 		room.unlock("nope");
-		assertEquals(false, room.isLocked());
+		assertTrue(room.isLocked());
 	}
 	
 	@Test

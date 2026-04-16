@@ -26,7 +26,7 @@ public class InventoryTest {
 		 
 		 emptyInventory = new Inventory(1);
 		 
-		 inventory = new Inventory(3);
+		 inventory = new Inventory(4);
 		 inventory.addItem(new Weapon("Sword", "Slices", 5));
 		 inventory.addItem(new Weapon("Axe", "Chops", 6));
 		 inventory.addItem(new Weapon("Bow", "Shoots", 3));
@@ -42,7 +42,7 @@ public class InventoryTest {
 	}
 
 	private static Inventory createInventory() {
-	    Inventory inv = new Inventory(3);
+	    Inventory inv = new Inventory(4);
 	    inv.addItem(new Weapon("Sword", "Slices", 5));
 	    inv.addItem(new Weapon("Axe", "Chops", 6));
 	    inv.addItem(new Weapon("Bow", "Shoots", 3));
@@ -96,7 +96,7 @@ public class InventoryTest {
 	public static Stream<Arguments> presentFindCases()
 	{
 		return Stream.of(
-				Arguments.of("diamond"),
+				Arguments.of("Bow"),
 				Arguments.of("Sword"),
 				Arguments.of("Axe")
 				);
