@@ -322,6 +322,14 @@ public class RoomTest {
 	}
 	
 	@Test
+	public void alreadyUnlocked()
+	{
+		room.setLocked(false, room.getRequiredKeyName());
+		room.unlock("Master Key");
+		assertEquals(false, room.isLocked());
+	}
+	
+	@Test
 	public void shouldReturnNewKeyName()
 	{
 		room.setLocked(true, "password");
