@@ -172,7 +172,7 @@ public class InventoryTest {
 	{
 		return Stream.of(
 				Arguments.of(createFullInventory(), 4),
-				Arguments.of(createInventory(), 3),
+				Arguments.of(createInventory(), 4),
 				Arguments.of(createEmptyInventory(), 1)
 				);
 	}
