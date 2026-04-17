@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>RoomTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 11:19:43 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.model</a> &gt; <span class="el_source">RoomTest.java</span></div><h1>RoomTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.model;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>RoomTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 11:51:52 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.model</a> &gt; <span class="el_source">RoomTest.java</span></div><h1>RoomTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.model;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -373,5 +373,78 @@ import java.util.stream.Stream;
 
 <span class="fc" id="L374">	    assertTrue(room.findItem(&quot;Sword&quot;).isEmpty());</span>
 <span class="fc" id="L375">	}</span>
+	
+	
+	// ai generated to kill last 2%
+	@Test
+    void roomRemoveItemByNameActuallyRemovesItemFromRoom() {
+        // Kills: VoidMethodCallMutator on items::remove
+<span class="fc" id="L382">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L383">        room.addItem(new Potion(&quot;Coffee Potion&quot;, &quot;warm&quot;, 15));</span>
+<span class="fc" id="L384">        room.addItem(new Weapon(&quot;Sword&quot;, &quot;slices&quot;, 5));</span>
+ 
+<span class="fc" id="L386">        room.removeItemByName(&quot;Coffee Potion&quot;);</span>
+ 
+<span class="fc" id="L388">        assertEquals(1, room.getItems().size(), &quot;Room should have one fewer item&quot;);</span>
+<span class="fc" id="L389">        assertTrue(room.findItem(&quot;Coffee Potion&quot;).isEmpty());</span>
+<span class="fc" id="L390">        assertTrue(room.findItem(&quot;Sword&quot;).isPresent());</span>
+<span class="fc" id="L391">    }</span>
+ 
+    // ============================================================
+    //  Room.unlock - missing branch (requiredKeyName == null)
+    //  Without RoomUnlockBranchTest.java this branch survives.
+    //  These tests directly exercise Room.unlock so they don't rely
+    //  on InteractionEngine short-circuiting.
+    // ============================================================
+ 
+    @Test
+    void roomUnlockReturnsFalseWhenLockedButRequiredKeyNameIsNull() {
+        // Kills the NegateConditionalsMutator on `requiredKeyName != null`
+        // and any mutant on the &amp;&amp; short-circuit
+<span class="fc" id="L404">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L405">        room.setLocked(true, null);</span>
+ 
+<span class="fc" id="L407">        boolean result = room.unlock(&quot;AnyKey&quot;);</span>
+ 
+<span class="fc" id="L409">        assertFalse(result, &quot;unlock should return false when requiredKeyName is null&quot;);</span>
+<span class="fc" id="L410">        assertTrue(room.isLocked(), &quot;room should remain locked&quot;);</span>
+<span class="fc" id="L411">    }</span>
+ 
+    @Test
+    void roomUnlockReturnsTrueWhenAlreadyUnlocked() {
+        // Kills BooleanTrueReturnValsMutator on the !locked early return
+<span class="fc" id="L416">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+        // default state: locked = false
+<span class="fc" id="L418">        assertFalse(room.isLocked());</span>
+ 
+<span class="fc" id="L420">        boolean result = room.unlock(&quot;anyKey&quot;);</span>
+ 
+<span class="fc" id="L422">        assertTrue(result, &quot;Already-unlocked room should return true from unlock&quot;);</span>
+<span class="fc" id="L423">    }</span>
+ 
+    @Test
+    void roomUnlockReturnsTrueWithCorrectKeyAndChangesLockedState() {
+        // Kills BooleanTrueReturnValsMutator AND VoidMethodCall
+        // mutations on `locked = false` assignment
+<span class="fc" id="L429">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L430">        room.setLocked(true, &quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L432">        boolean result = room.unlock(&quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L434">        assertTrue(result, &quot;unlock with correct key should return true&quot;);</span>
+<span class="fc" id="L435">        assertFalse(room.isLocked(), &quot;room should now be unlocked&quot;);</span>
+<span class="fc" id="L436">    }</span>
+ 
+    @Test
+    void roomUnlockIsCaseInsensitiveForKeyName() {
+        // Kills any mutant that changes equalsIgnoreCase to equals
+<span class="fc" id="L441">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L442">        room.setLocked(true, &quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L444">        boolean result = room.unlock(&quot;BRASS KEY&quot;);</span>
+ 
+<span class="fc" id="L446">        assertTrue(result, &quot;unlock should be case-insensitive&quot;);</span>
+<span class="fc" id="L447">        assertFalse(room.isLocked());</span>
+<span class="fc" id="L448">    }</span>
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 11:19:43 PM)</div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 11:51:52 PM)</div></body></html>

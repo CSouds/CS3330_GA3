@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ItemTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 11:19:43 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.model</a> &gt; <span class="el_source">ItemTest.java</span></div><h1>ItemTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.model;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ItemTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 11:51:52 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.model</a> &gt; <span class="el_source">ItemTest.java</span></div><h1>ItemTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.model;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -100,5 +100,71 @@ import java.util.stream.Stream;
 <span class="fc" id="L100">	    QuestItem qi = new QuestItem(&quot;Lost Gradebook&quot;, &quot;The legendary tome&quot;);</span>
 <span class="fc" id="L101">	    assertEquals(&quot;Lost Gradebook&quot;, qi.getName());</span>
 <span class="fc" id="L102">	}</span>
+	
+	
+	// ai generated for mutation killing last 2%
+	@Test
+    void inventoryRemoveItemReturnsRemovedItemWhenPresent() {
+        // Kills: NullReturnValsMutator on Inventory.removeItem (item present path)
+<span class="fc" id="L109">        Inventory inv = new Inventory(5);</span>
+<span class="fc" id="L110">        Weapon sword = new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5);</span>
+<span class="fc" id="L111">        inv.addItem(sword);</span>
+ 
+<span class="fc" id="L113">        Item returned = inv.removeItem(&quot;Sword&quot;);</span>
+ 
+<span class="fc" id="L115">        assertNotNull(returned, &quot;removeItem should return the removed item, not null&quot;);</span>
+<span class="fc" id="L116">        assertSame(sword, returned, &quot;removeItem should return the EXACT item that was in the inventory&quot;);</span>
+<span class="fc" id="L117">        assertEquals(&quot;Sword&quot;, returned.getName());</span>
+<span class="fc" id="L118">    }</span>
+ 
+    @Test
+    void inventoryRemoveItemReturnsNullWhenItemMissing() {
+        // Kills: any return-value mutant on the empty Optional path
+<span class="fc" id="L123">        Inventory inv = new Inventory(5);</span>
+<span class="fc" id="L124">        inv.addItem(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5));</span>
+ 
+<span class="fc" id="L126">        Item returned = inv.removeItem(&quot;Bow&quot;);</span>
+ 
+<span class="fc" id="L128">        assertNull(returned, &quot;removeItem should return null when item is not in inventory&quot;);</span>
+        // Inventory should be unchanged
+<span class="fc" id="L130">        assertTrue(inv.contains(&quot;Sword&quot;));</span>
+<span class="fc" id="L131">        assertEquals(1, inv.getItems().size());</span>
+<span class="fc" id="L132">    }</span>
+ 
+    @Test
+    void inventoryRemoveItemActuallyRemovesItemFromList() {
+        // Kills: VoidMethodCallMutator on items::remove in ifPresent
+        // (if remove call is removed, item stays in the list)
+<span class="fc" id="L138">        Inventory inv = new Inventory(5);</span>
+<span class="fc" id="L139">        inv.addItem(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5));</span>
+<span class="fc" id="L140">        inv.addItem(new Weapon(&quot;Axe&quot;, &quot;Chops&quot;, 6));</span>
+ 
+<span class="fc" id="L142">        Item returned = inv.removeItem(&quot;Sword&quot;);</span>
+ 
+<span class="fc" id="L144">        assertNotNull(returned);</span>
+<span class="fc" id="L145">        assertEquals(1, inv.getItems().size(), &quot;Inventory size should drop after remove&quot;);</span>
+<span class="fc" id="L146">        assertFalse(inv.contains(&quot;Sword&quot;));</span>
+<span class="fc" id="L147">        assertTrue(inv.contains(&quot;Axe&quot;));</span>
+<span class="fc" id="L148">    }</span>
+ 
+    // ============================================================
+    //  Room.removeItemByName - return value mutants
+    //  Same pattern as Inventory.removeItem. Plus this is a chance to
+    //  pin down that the EXACT instance is returned, killing
+    //  NullReturnValsMutator and EmptyObjectReturnValsMutator.
+    // ============================================================
+ 
+    @Test
+    void roomRemoveItemByNameReturnsRemovedItem() {
+        // Kills: NullReturnValsMutator on Room.removeItemByName (present path)
+<span class="fc" id="L160">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L161">        Potion potion = new Potion(&quot;Coffee Potion&quot;, &quot;warm&quot;, 15);</span>
+<span class="fc" id="L162">        room.addItem(potion);</span>
+ 
+<span class="fc" id="L164">        Item returned = room.removeItemByName(&quot;Coffee Potion&quot;);</span>
+ 
+<span class="fc" id="L166">        assertNotNull(returned, &quot;Should return the removed item&quot;);</span>
+<span class="fc" id="L167">        assertSame(potion, returned, &quot;Should return the EXACT instance&quot;);</span>
+<span class="fc" id="L168">    }</span>
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 11:19:43 PM)</div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 11:51:52 PM)</div></body></html>
