@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>QuestTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 11:19:43 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.model</a> &gt; <span class="el_source">QuestTest.java</span></div><h1>QuestTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.model;
+
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.stream.Stream;
+
+<span class="fc" id="L12">public class QuestTest {</span>
+    private Quest q;
+
+    @BeforeEach
+    public void setUp()
+    {
+<span class="fc" id="L18">        q = new Quest(&quot;Pick up sticks&quot;, &quot;Pick up all sticks to complete&quot;);</span>
+<span class="fc" id="L19">    }</span>
+
+    public static Quest createNotStartedQuest()
+    {
+<span class="fc" id="L23">        Quest notStarted = new Quest(&quot;Trees&quot;, &quot;Chop down trees&quot;);</span>
+<span class="fc" id="L24">        return notStarted;</span>
+    }
+
+    public static Quest createStartedQuest()
+    {
+<span class="fc" id="L29">        Quest started = new Quest(&quot;Trees&quot;, &quot;Chop down trees&quot;);</span>
+<span class="fc" id="L30">        started.markGradebookRecovered();</span>
+<span class="fc" id="L31">        return started;</span>
+    }
+
+    public static Quest createCompletedQuest()
+    {
+<span class="fc" id="L36">        Quest completed = new Quest(&quot;Trees&quot;, &quot;Chop down trees&quot;);</span>
+<span class="fc" id="L37">        completed.markGradebookRecovered();</span>
+<span class="fc" id="L38">        completed.markPhantomDefeated();</span>
+<span class="fc" id="L39">        return completed;</span>
+    }
+
+    @Test
+    public void shouldGetName()
+    {
+<span class="fc" id="L45">        assertEquals(&quot;Pick up sticks&quot;, q.getName());</span>
+<span class="fc" id="L46">    }</span>
+
+    @Test
+    public void shouldGetDescription()
+    {
+<span class="fc" id="L51">        assertEquals(&quot;Pick up all sticks to complete&quot;, q.getDescription());</span>
+<span class="fc" id="L52">    }</span>
+
+    public static Stream&lt;Arguments&gt; questStatusCases()
+    {
+<span class="fc" id="L56">        return Stream.of(</span>
+<span class="fc" id="L57">                Arguments.of(createNotStartedQuest(), QuestStatus.NOT_STARTED),</span>
+<span class="fc" id="L58">                Arguments.of(createStartedQuest(), QuestStatus.IN_PROGRESS),</span>
+<span class="fc" id="L59">                Arguments.of(createCompletedQuest(), QuestStatus.COMPLETED)</span>
+                );
+    }
+    @ParameterizedTest
+    @MethodSource(&quot;questStatusCases&quot;)
+    public void questStatusTest(Quest q, QuestStatus expected)
+    {
+<span class="fc" id="L66">        assertEquals(expected, q.getStatus());</span>
+<span class="fc" id="L67">    }</span>
+
+    @Test
+    public void gradeBookNotRecovered()
+    {
+<span class="fc" id="L72">        assertFalse(q.isGradebookRecovered());</span>
+<span class="fc" id="L73">    }</span>
+
+    @Test
+    public void gradeBookRecovered()
+    {
+<span class="fc" id="L78">        q.markGradebookRecovered();</span>
+<span class="fc" id="L79">        assertTrue(q.isGradebookRecovered());</span>
+<span class="fc" id="L80">    }</span>
+
+    @Test
+    public void phantomNotDefeated()
+    {
+<span class="fc" id="L85">        assertFalse(q.isPhantomDefeated());</span>
+<span class="fc" id="L86">    }</span>
+
+    @Test
+    public void phantomDefeated()
+    {
+<span class="fc" id="L91">        q.markPhantomDefeated();</span>
+<span class="fc" id="L92">        assertTrue(q.isPhantomDefeated());</span>
+<span class="fc" id="L93">    }</span>
+    
+    @Test
+    public void updateStatusWithNothingMarkedStaysNotStarted()
+    {
+<span class="fc" id="L98">        q.updateStatus();</span>
+<span class="fc" id="L99">        assertEquals(QuestStatus.NOT_STARTED, q.getStatus());</span>
+<span class="fc" id="L100">    }</span>
+
+    @Test
+    public void statusShouldUpdateStarted()
+    {
+<span class="fc" id="L105">        q.markGradebookRecovered();</span>
+<span class="fc" id="L106">        assertEquals(QuestStatus.IN_PROGRESS, q.getStatus());</span>
+<span class="fc" id="L107">    }</span>
+
+    @Test
+    public void statusShouldUpdateCompleted()
+    {
+<span class="fc" id="L112">        q.markGradebookRecovered();</span>
+<span class="fc" id="L113">        q.markPhantomDefeated();</span>
+<span class="fc" id="L114">        assertEquals(QuestStatus.COMPLETED, q.getStatus());</span>
+<span class="fc" id="L115">    }</span>
+
+    @Test
+    public void notCompleted()
+    {
+<span class="fc" id="L120">        assertFalse(q.isComplete());</span>
+<span class="fc" id="L121">    }</span>
+
+    @Test
+    public void isCompleted()
+    {
+<span class="fc" id="L126">        q.markGradebookRecovered();</span>
+<span class="fc" id="L127">        q.markPhantomDefeated();</span>
+<span class="fc" id="L128">        assertTrue(q.isComplete());</span>
+<span class="fc" id="L129">    }</span>
+    
+    @Test
+    public void questStatusValues_exist()
+    {
+<span class="fc" id="L134">        assertEquals(3, QuestStatus.values().length);</span>
+<span class="fc" id="L135">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 11:19:43 PM)</div></body></html>

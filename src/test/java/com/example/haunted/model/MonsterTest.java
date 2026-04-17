@@ -123,4 +123,11 @@ public class MonsterTest {
 		b.takeDamage(damage);
 		assertEquals(expected, b.getCurrentAttack());
 	}
+	
+	@Test
+	void takeDamage_negative_doesNothing() {
+	    Monster m = new Monster("Goblin", 30, 5, 2, List.of());
+	    m.takeDamage(-10);
+	    assertEquals(30, m.getHealth());
+	}
 }

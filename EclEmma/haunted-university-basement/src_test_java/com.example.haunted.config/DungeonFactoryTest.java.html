@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>DungeonFactoryTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 11:19:43 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.config</a> &gt; <span class="el_source">DungeonFactoryTest.java</span></div><h1>DungeonFactoryTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.config;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import com.example.haunted.engine.GameEngine;
+import com.example.haunted.model.Armor;
+import com.example.haunted.model.BossMonster;
+import com.example.haunted.model.Direction;
+import com.example.haunted.model.Monster;
+import com.example.haunted.model.Potion;
+import com.example.haunted.model.Room;
+import com.example.haunted.model.Trap;
+import com.example.haunted.model.TrapType;
+import com.example.haunted.model.Weapon;
+<span class="fc" id="L17">class DungeonFactoryTest </span>
+{
+
+	@Test
+	void createGame_setsPlayerStatsCorrectly() {
+<span class="fc" id="L22">	    GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L24">	    assertEquals(&quot;Student Explorer&quot;, engine.getPlayer().getName());</span>
+<span class="fc" id="L25">	    assertEquals(50, engine.getPlayer().getHealth());</span>
+<span class="fc" id="L26">	    assertEquals(50, engine.getPlayer().getMaxHealth());</span>
+<span class="fc" id="L27">	    assertEquals(7, engine.getPlayer().getBaseAttack());</span>
+<span class="fc" id="L28">	    assertEquals(2, engine.getPlayer().getBaseDefense());</span>
+<span class="fc" id="L29">	}</span>
+	
+	@Test
+	void playerStartsInStairwell()
+	{
+<span class="fc" id="L34">		GameEngine engine = DungeonFactory.createGame();</span>
+		
+<span class="fc" id="L36">		assertEquals(&quot;stairwell&quot;, engine.getCurrentRoom().getId());</span>
+<span class="fc" id="L37">		assertEquals(&quot;Maintenance Stairwell&quot;, engine.getCurrentRoom().getName());</span>
+<span class="fc" id="L38">	}</span>
+	
+	@Test
+	void stairwellConnectsEastToLectureHall()
+	{
+<span class="fc" id="L43">		GameEngine engine = DungeonFactory.createGame();</span>
+		
+<span class="fc" id="L45">		Room eastRoom = engine.getCurrentRoom().getExit(Direction.EAST);</span>
+		
+<span class="fc" id="L47">		assertNotNull(eastRoom);</span>
+<span class="fc" id="L48">		assertEquals(&quot;lectureHall&quot;, eastRoom.getId());</span>
+<span class="fc" id="L49">	}</span>
+
+	@Test
+	void examArchiveStartsLockedWithArchiveKey()
+	{
+<span class="fc" id="L54">		GameEngine engine = DungeonFactory.createGame();</span>
+		
+<span class="fc" id="L56">		Room lectureHall = engine.getCurrentRoom().getExit(Direction.EAST);</span>
+<span class="fc" id="L57">		Room examArchive = lectureHall.getExit(Direction.NORTH);</span>
+		
+<span class="fc" id="L59">		assertTrue(examArchive.isLocked());</span>
+<span class="fc" id="L60">		assertEquals(&quot;Archive Key&quot;, examArchive.getRequiredKeyName());</span>
+<span class="fc" id="L61">	}</span>
+	
+	@Test
+	void brokenElevatorHasElectricTrapForEightDamage()
+	{
+<span class="fc" id="L66">		GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L68">	    Room lectureHall = engine.getCurrentRoom().getExit(Direction.EAST);</span>
+<span class="fc" id="L69">	    Room brokenElevator = lectureHall.getExit(Direction.SOUTH);</span>
+
+<span class="fc" id="L71">	    assertNotNull(brokenElevator.getTrap());</span>
+<span class="fc" id="L72">	    assertEquals(&quot;Loose Wires Trap&quot;, brokenElevator.getTrap().getName());</span>
+<span class="fc" id="L73">	    assertEquals(8, brokenElevator.getTrap().getDamage());</span>
+<span class="fc" id="L74">	}</span>
+	@Test
+	void brokenElevatorTrapFullyConfigured() {
+<span class="fc" id="L77">	    GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L79">	    Room lectureHall = engine.getCurrentRoom().getExit(Direction.EAST);</span>
+<span class="fc" id="L80">	    Room brokenElevator = lectureHall.getExit(Direction.SOUTH);</span>
+
+<span class="fc" id="L82">	    Trap trap = brokenElevator.getTrap();</span>
+
+<span class="fc" id="L84">	    assertNotNull(trap);</span>
+<span class="fc" id="L85">	    assertEquals(&quot;Loose Wires Trap&quot;, trap.getName());</span>
+<span class="fc" id="L86">	    assertEquals(TrapType.ELECTRIC, trap.getType());</span>
+<span class="fc" id="L87">	    assertEquals(8, trap.getDamage());</span>
+<span class="fc" id="L88">	    assertTrue(trap.isArmed());</span>
+<span class="fc" id="L89">	    assertTrue(trap.isOneTimeTrigger());</span>
+<span class="fc" id="L90">	}</span>
+	@Test
+	void finalChamberStartsLockedAndContainsFinalBoss()
+	{
+<span class="fc" id="L94">		GameEngine engine = DungeonFactory.createGame();</span>
+		
+<span class="fc" id="L96">		Room lectureHall = engine.getCurrentRoom().getExit(Direction.EAST);</span>
+<span class="fc" id="L97">		Room examArchive = lectureHall.getExit(Direction.NORTH);</span>
+<span class="fc" id="L98">		Room deanVault = examArchive.getExit(Direction.EAST);</span>
+<span class="fc" id="L99">		Room finalChamber = deanVault.getExit(Direction.NORTH);</span>
+		
+<span class="fc" id="L101">		assertTrue(finalChamber.isLocked());</span>
+<span class="fc" id="L102">		assertEquals(&quot;Vault Key&quot;, finalChamber.getRequiredKeyName());</span>
+		
+<span class="fc" id="L104">		assertTrue(finalChamber.findMonster(&quot;Final Exam Phantom&quot;).isPresent());</span>
+<span class="fc" id="L105">	}</span>
+	
+	@Test
+	void createGame_placesItemsCorrectly() {
+<span class="fc" id="L109">	    GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L111">	    Room stairwell = engine.getCurrentRoom();</span>
+<span class="fc" id="L112">	    Room lectureHall = stairwell.getExit(Direction.EAST);</span>
+<span class="fc" id="L113">	    Room labStorage = lectureHall.getExit(Direction.EAST);</span>
+<span class="fc" id="L114">	    Room serverCloset = labStorage.getExit(Direction.NORTH);</span>
+<span class="fc" id="L115">	    Room examArchive = lectureHall.getExit(Direction.NORTH);</span>
+<span class="fc" id="L116">	    Room deanVault = examArchive.getExit(Direction.EAST);</span>
+
+<span class="fc" id="L118">	    assertTrue(lectureHall.findItem(&quot;Coffee Potion&quot;).isPresent());</span>
+<span class="fc" id="L119">	    assertTrue(labStorage.findItem(&quot;Archive Key&quot;).isPresent());</span>
+<span class="fc" id="L120">	    assertTrue(labStorage.findItem(&quot;Calculator Shield&quot;).isPresent());</span>
+<span class="fc" id="L121">	    assertTrue(serverCloset.findItem(&quot;Stapler of Justice&quot;).isPresent());</span>
+<span class="fc" id="L122">	    assertTrue(examArchive.findItem(&quot;Lost Gradebook&quot;).isPresent());</span>
+<span class="fc" id="L123">	    assertTrue(deanVault.findItem(&quot;Vault Key&quot;).isPresent());</span>
+<span class="fc" id="L124">	}</span>
+	
+	@Test
+	void createGame_itemStatsCorrect() {
+<span class="fc" id="L128">	    GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L130">	    Room stairwell = engine.getCurrentRoom();</span>
+<span class="fc" id="L131">	    Room lectureHall = stairwell.getExit(Direction.EAST);</span>
+<span class="fc" id="L132">	    Room labStorage = lectureHall.getExit(Direction.EAST);</span>
+<span class="fc" id="L133">	    Room serverCloset = labStorage.getExit(Direction.NORTH);</span>
+
+<span class="fc" id="L135">	    Potion coffee = (Potion) lectureHall.findItem(&quot;Coffee Potion&quot;).orElseThrow();</span>
+<span class="fc" id="L136">	    Armor shield = (Armor) labStorage.findItem(&quot;Calculator Shield&quot;).orElseThrow();</span>
+<span class="fc" id="L137">	    Weapon stapler = (Weapon) serverCloset.findItem(&quot;Stapler of Justice&quot;).orElseThrow();</span>
+
+<span class="fc" id="L139">	    assertEquals(15, coffee.getHealingAmount());</span>
+<span class="fc" id="L140">	    assertEquals(3, shield.getDefenseBonus());</span>
+<span class="fc" id="L141">	    assertEquals(4, stapler.getAttackBonus());</span>
+<span class="fc" id="L142">	}</span>
+	
+	@Test
+	void createGame_placesMonstersCorrectly() {
+<span class="fc" id="L146">	    GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L148">	    Room stairwell = engine.getCurrentRoom();</span>
+<span class="fc" id="L149">	    Room lectureHall = stairwell.getExit(Direction.EAST);</span>
+<span class="fc" id="L150">	    Room labStorage = lectureHall.getExit(Direction.EAST);</span>
+<span class="fc" id="L151">	    Room serverCloset = labStorage.getExit(Direction.NORTH);</span>
+<span class="fc" id="L152">	    Room examArchive = lectureHall.getExit(Direction.NORTH);</span>
+<span class="fc" id="L153">	    Room deanVault = examArchive.getExit(Direction.EAST);</span>
+<span class="fc" id="L154">	    Room finalChamber = deanVault.getExit(Direction.NORTH);</span>
+
+<span class="fc" id="L156">	    assertTrue(lectureHall.findMonster(&quot;Sleep-Deprived TA&quot;).isPresent());</span>
+<span class="fc" id="L157">	    assertTrue(serverCloset.findMonster(&quot;Spreadsheet Golem&quot;).isPresent());</span>
+<span class="fc" id="L158">	    assertTrue(examArchive.findMonster(&quot;Plagiarism Ghost&quot;).isPresent());</span>
+<span class="fc" id="L159">	    assertTrue(deanVault.findMonster(&quot;Registrar Wraith&quot;).isPresent());</span>
+<span class="fc" id="L160">	    assertTrue(finalChamber.findMonster(&quot;Final Exam Phantom&quot;).isPresent());</span>
+<span class="fc" id="L161">	}</span>
+	
+	@Test
+	void createGame_monsterStatsCorrect() {
+<span class="fc" id="L165">	    GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L167">	    Room stairwell = engine.getCurrentRoom();</span>
+<span class="fc" id="L168">	    Room lectureHall = stairwell.getExit(Direction.EAST);</span>
+<span class="fc" id="L169">	    Room labStorage = lectureHall.getExit(Direction.EAST);</span>
+<span class="fc" id="L170">	    Room serverCloset = labStorage.getExit(Direction.NORTH);</span>
+<span class="fc" id="L171">	    Room examArchive = lectureHall.getExit(Direction.NORTH);</span>
+<span class="fc" id="L172">	    Room deanVault = examArchive.getExit(Direction.EAST);</span>
+<span class="fc" id="L173">	    Room finalChamber = deanVault.getExit(Direction.NORTH);</span>
+
+<span class="fc" id="L175">	    Monster ta = lectureHall.findMonster(&quot;Sleep-Deprived TA&quot;).orElseThrow();</span>
+<span class="fc" id="L176">	    Monster golem = serverCloset.findMonster(&quot;Spreadsheet Golem&quot;).orElseThrow();</span>
+<span class="fc" id="L177">	    Monster ghost = examArchive.findMonster(&quot;Plagiarism Ghost&quot;).orElseThrow();</span>
+<span class="fc" id="L178">	    Monster wraith = deanVault.findMonster(&quot;Registrar Wraith&quot;).orElseThrow();</span>
+<span class="fc" id="L179">	    Monster boss = finalChamber.findMonster(&quot;Final Exam Phantom&quot;).orElseThrow();</span>
+
+<span class="fc" id="L181">	    assertEquals(18, ta.getMaxHealth());</span>
+<span class="fc" id="L182">	    assertEquals(6, ta.getAttack());</span>
+<span class="fc" id="L183">	    assertEquals(1, ta.getDefense());</span>
+
+<span class="fc" id="L185">	    assertEquals(28, golem.getMaxHealth());</span>
+<span class="fc" id="L186">	    assertEquals(7, golem.getAttack());</span>
+<span class="fc" id="L187">	    assertEquals(4, golem.getDefense());</span>
+
+<span class="fc" id="L189">	    assertEquals(22, ghost.getMaxHealth());</span>
+<span class="fc" id="L190">	    assertEquals(8, ghost.getAttack());</span>
+<span class="fc" id="L191">	    assertEquals(2, ghost.getDefense());</span>
+
+<span class="fc" id="L193">	    assertEquals(30, wraith.getMaxHealth());</span>
+<span class="fc" id="L194">	    assertEquals(9, wraith.getAttack());</span>
+<span class="fc" id="L195">	    assertEquals(3, wraith.getDefense());</span>
+
+<span class="fc" id="L197">	    assertInstanceOf(BossMonster.class, boss);</span>
+<span class="fc" id="L198">	    assertEquals(40, boss.getMaxHealth());</span>
+<span class="fc" id="L199">	}</span>
+	
+	@Test
+	void createGame_monsterLootCorrect() {
+<span class="fc" id="L203">	    GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L205">	    Room stairwell = engine.getCurrentRoom();</span>
+<span class="fc" id="L206">	    Room lectureHall = stairwell.getExit(Direction.EAST);</span>
+<span class="fc" id="L207">	    Room labStorage = lectureHall.getExit(Direction.EAST);</span>
+<span class="fc" id="L208">	    Room serverCloset = labStorage.getExit(Direction.NORTH);</span>
+<span class="fc" id="L209">	    Room examArchive = lectureHall.getExit(Direction.NORTH);</span>
+<span class="fc" id="L210">	    Room deanVault = examArchive.getExit(Direction.EAST);</span>
+
+<span class="fc" id="L212">	    Monster ta = lectureHall.findMonster(&quot;Sleep-Deprived TA&quot;).orElseThrow();</span>
+<span class="fc" id="L213">	    Monster golem = serverCloset.findMonster(&quot;Spreadsheet Golem&quot;).orElseThrow();</span>
+<span class="fc" id="L214">	    Monster wraith = deanVault.findMonster(&quot;Registrar Wraith&quot;).orElseThrow();</span>
+
+<span class="fc" id="L216">	    assertEquals(&quot;Coffee Potion&quot;, ta.getLoot().get(0).getName());</span>
+<span class="fc" id="L217">	    assertEquals(&quot;Dry Erase Sword&quot;, golem.getLoot().get(0).getName());</span>
+<span class="fc" id="L218">	    assertEquals(&quot;Graduation Gown Armor&quot;, wraith.getLoot().get(0).getName());</span>
+<span class="fc" id="L219">	}</span>
+	
+	@Test
+	void createGame_connectsAllRoomsCorrectly() {
+<span class="fc" id="L223">	    GameEngine engine = DungeonFactory.createGame();</span>
+
+<span class="fc" id="L225">	    Room stairwell = engine.getCurrentRoom();</span>
+<span class="fc" id="L226">	    Room lectureHall = stairwell.getExit(Direction.EAST);</span>
+<span class="fc" id="L227">	    Room labStorage = lectureHall.getExit(Direction.EAST);</span>
+<span class="fc" id="L228">	    Room brokenElevator = lectureHall.getExit(Direction.SOUTH);</span>
+<span class="fc" id="L229">	    Room examArchive = lectureHall.getExit(Direction.NORTH);</span>
+<span class="fc" id="L230">	    Room serverCloset = labStorage.getExit(Direction.NORTH);</span>
+<span class="fc" id="L231">	    Room deanVault = examArchive.getExit(Direction.EAST);</span>
+<span class="fc" id="L232">	    Room finalChamber = deanVault.getExit(Direction.NORTH);</span>
+
+<span class="fc" id="L234">	    assertEquals(&quot;stairwell&quot;, stairwell.getId());</span>
+<span class="fc" id="L235">	    assertEquals(&quot;lectureHall&quot;, lectureHall.getId());</span>
+<span class="fc" id="L236">	    assertEquals(&quot;labStorage&quot;, labStorage.getId());</span>
+<span class="fc" id="L237">	    assertEquals(&quot;brokenElevator&quot;, brokenElevator.getId());</span>
+<span class="fc" id="L238">	    assertEquals(&quot;examArchive&quot;, examArchive.getId());</span>
+<span class="fc" id="L239">	    assertEquals(&quot;serverCloset&quot;, serverCloset.getId());</span>
+<span class="fc" id="L240">	    assertEquals(&quot;deanVault&quot;, deanVault.getId());</span>
+<span class="fc" id="L241">	    assertEquals(&quot;finalChamber&quot;, finalChamber.getId());</span>
+
+	    // reverse connections
+<span class="fc" id="L244">	    assertSame(stairwell, lectureHall.getExit(Direction.WEST));</span>
+<span class="fc" id="L245">	    assertSame(lectureHall, labStorage.getExit(Direction.WEST));</span>
+<span class="fc" id="L246">	    assertSame(lectureHall, brokenElevator.getExit(Direction.NORTH));</span>
+<span class="fc" id="L247">	    assertSame(labStorage, serverCloset.getExit(Direction.SOUTH));</span>
+<span class="fc" id="L248">	    assertSame(lectureHall, examArchive.getExit(Direction.SOUTH));</span>
+<span class="fc" id="L249">	    assertSame(examArchive, deanVault.getExit(Direction.WEST));</span>
+<span class="fc" id="L250">	    assertSame(serverCloset, deanVault.getExit(Direction.SOUTH));</span>
+<span class="fc" id="L251">	    assertSame(deanVault, finalChamber.getExit(Direction.SOUTH));</span>
+<span class="fc" id="L252">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 11:19:43 PM)</div></body></html>

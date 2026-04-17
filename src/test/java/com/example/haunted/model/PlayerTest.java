@@ -169,4 +169,19 @@ public class PlayerTest {
 		}
 		assertEquals(expectedBonus, player.getDefensePower());
 	}
+	
+	@Test
+	void takeDamage_negative_doesNothing() {
+	    Player p = new Player("Test", 100, 5, 5, new Inventory(5));
+	    p.takeDamage(-10);
+	    assertEquals(100, p.getHealth());
+	}
+
+	@Test
+	void heal_negative_doesNothing() {
+	    Player p = new Player("Test", 100, 5, 5, new Inventory(5));
+	    p.takeDamage(20); // now 80
+	    p.heal(-10);
+	    assertEquals(80, p.getHealth());
+	}
 }
