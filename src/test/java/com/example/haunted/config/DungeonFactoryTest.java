@@ -9,6 +9,7 @@ import com.example.haunted.model.Armor;
 import com.example.haunted.model.BossMonster;
 import com.example.haunted.model.Direction;
 import com.example.haunted.model.Monster;
+import com.example.haunted.model.Player;
 import com.example.haunted.model.Potion;
 import com.example.haunted.model.Room;
 import com.example.haunted.model.Trap;
@@ -250,4 +251,61 @@ class DungeonFactoryTest
 	    assertSame(serverCloset, deanVault.getExit(Direction.SOUTH));
 	    assertSame(deanVault, finalChamber.getExit(Direction.SOUTH));
 	}
-}
+	
+	
+	// ai generated to kill last 2%
+    @Test
+    void finalExamPhantomBossHasExactCombatStats() {
+        // Targets the BossMonster constructor on DungeonFactory line 84:
+        //   new BossMonster("Final Exam Phantom", 40, 10, 4, List.of(), 3)
+        // Asserts every numeric literal so every "x -> x+1" / "x -> 0" mutant dies.
+        GameEngine engine = DungeonFactory.createGame();
+
+        Room lectureHall = engine.getCurrentRoom().getExit(Direction.EAST);
+        Room examArchive = lectureHall.getExit(Direction.NORTH);
+        Room deanVault = examArchive.getExit(Direction.EAST);
+        Room finalChamber = deanVault.getExit(Direction.NORTH);
+
+        Monster boss = finalChamber.findMonster("Final Exam Phantom").orElseThrow();
+        assertInstanceOf(BossMonster.class, boss);
+
+        BossMonster phantom = (BossMonster) boss;
+        assertEquals(40, phantom.getMaxHealth(), "boss max health");
+        assertEquals(40, phantom.getHealth(), "boss starting health");
+        assertEquals(10, phantom.getAttack(), "boss base attack");
+        assertEquals(4, phantom.getDefense(), "boss defense");
+        assertTrue(phantom.getLoot().isEmpty(), "boss should have no loot");
+
+        // Pin down enragedAttackBonus = 3:
+        // base attack is 10; when health <= 20, currentAttack = 10 + 3 = 13.
+        assertEquals(10, phantom.getCurrentAttack(),
+                "boss should use base attack while above half health");
+
+        phantom.takeDamage(20); // health -> 20, exactly half
+        assertEquals(13, phantom.getCurrentAttack(),
+                "boss should use base + enragedAttackBonus (3) at half health");
+    }
+
+    @Test
+    void playerInventoryCapacityIsExactlyEight() {
+        // DungeonFactory line 86: new Inventory(8). Without this assertion,
+        // Pitest can mutate 8 -> 0, 1, 7, 9 etc. and the mutant survives.
+        GameEngine engine = DungeonFactory.createGame();
+        Player player = engine.getPlayer();
+
+        assertEquals(8, player.getInventory().getCapacity(),
+                "Player inventory should start with capacity 8");
+    }
+
+    @Test
+    void questIsNotStartedAtGameStart() {
+        // Asserts the Quest is properly initialized with default state.
+        GameEngine engine = DungeonFactory.createGame();
+
+        assertNotNull(engine.getQuest());
+        assertFalse(engine.getQuest().isComplete());
+        assertFalse(engine.getQuest().isGradebookRecovered());
+        assertFalse(engine.getQuest().isPhantomDefeated());
+        assertEquals("Escape the Basement", engine.getQuest().getName());
+	    }
+	}

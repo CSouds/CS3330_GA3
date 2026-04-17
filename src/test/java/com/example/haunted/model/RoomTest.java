@@ -373,4 +373,77 @@ public class RoomTest {
 
 	    assertTrue(room.findItem("Sword").isEmpty());
 	}
+	
+	
+	// ai generated to kill last 2%
+	@Test
+    void roomRemoveItemByNameActuallyRemovesItemFromRoom() {
+        // Kills: VoidMethodCallMutator on items::remove
+        Room room = new Room("r", "Room", "desc");
+        room.addItem(new Potion("Coffee Potion", "warm", 15));
+        room.addItem(new Weapon("Sword", "slices", 5));
+ 
+        room.removeItemByName("Coffee Potion");
+ 
+        assertEquals(1, room.getItems().size(), "Room should have one fewer item");
+        assertTrue(room.findItem("Coffee Potion").isEmpty());
+        assertTrue(room.findItem("Sword").isPresent());
+    }
+ 
+    // ============================================================
+    //  Room.unlock - missing branch (requiredKeyName == null)
+    //  Without RoomUnlockBranchTest.java this branch survives.
+    //  These tests directly exercise Room.unlock so they don't rely
+    //  on InteractionEngine short-circuiting.
+    // ============================================================
+ 
+    @Test
+    void roomUnlockReturnsFalseWhenLockedButRequiredKeyNameIsNull() {
+        // Kills the NegateConditionalsMutator on `requiredKeyName != null`
+        // and any mutant on the && short-circuit
+        Room room = new Room("r", "Room", "desc");
+        room.setLocked(true, null);
+ 
+        boolean result = room.unlock("AnyKey");
+ 
+        assertFalse(result, "unlock should return false when requiredKeyName is null");
+        assertTrue(room.isLocked(), "room should remain locked");
+    }
+ 
+    @Test
+    void roomUnlockReturnsTrueWhenAlreadyUnlocked() {
+        // Kills BooleanTrueReturnValsMutator on the !locked early return
+        Room room = new Room("r", "Room", "desc");
+        // default state: locked = false
+        assertFalse(room.isLocked());
+ 
+        boolean result = room.unlock("anyKey");
+ 
+        assertTrue(result, "Already-unlocked room should return true from unlock");
+    }
+ 
+    @Test
+    void roomUnlockReturnsTrueWithCorrectKeyAndChangesLockedState() {
+        // Kills BooleanTrueReturnValsMutator AND VoidMethodCall
+        // mutations on `locked = false` assignment
+        Room room = new Room("r", "Room", "desc");
+        room.setLocked(true, "Brass Key");
+ 
+        boolean result = room.unlock("Brass Key");
+ 
+        assertTrue(result, "unlock with correct key should return true");
+        assertFalse(room.isLocked(), "room should now be unlocked");
+    }
+ 
+    @Test
+    void roomUnlockIsCaseInsensitiveForKeyName() {
+        // Kills any mutant that changes equalsIgnoreCase to equals
+        Room room = new Room("r", "Room", "desc");
+        room.setLocked(true, "Brass Key");
+ 
+        boolean result = room.unlock("BRASS KEY");
+ 
+        assertTrue(result, "unlock should be case-insensitive");
+        assertFalse(room.isLocked());
+    }
 }
