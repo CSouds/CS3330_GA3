@@ -354,4 +354,75 @@ public class RoomTest {
 		
 		assertNotEquals(t, room.getTrap());
 	}
+	
+	@Test
+    void unlockReturnsTrueWhenAlreadyUnlocked() {
+        Room room = new Room("r", "Room", "desc");
+        // Default state: locked=false
+        assertTrue(room.unlock("anything"));
+        assertFalse(room.isLocked());
+    }
+ 
+    @Test
+    void unlockReturnsTrueWithCorrectKey() {
+        Room room = new Room("r", "Room", "desc");
+        room.setLocked(true, "Brass Key");
+ 
+        boolean result = room.unlock("Brass Key");
+ 
+        assertTrue(result);
+        assertFalse(room.isLocked());
+    }
+ 
+    @Test
+    void unlockReturnsTrueWithCorrectKeyDifferentCase() {
+        // Kills the equalsIgnoreCase -> equals mutant on this line.
+        Room room = new Room("r", "Room", "desc");
+        room.setLocked(true, "Brass Key");
+ 
+        boolean result = room.unlock("brass key");
+ 
+        assertTrue(result);
+        assertFalse(room.isLocked());
+    }
+ 
+    @Test
+    void unlockReturnsFalseWithWrongKey() {
+        Room room = new Room("r", "Room", "desc");
+        room.setLocked(true, "Brass Key");
+ 
+        boolean result = room.unlock("Iron Key");
+ 
+        assertFalse(result);
+        assertTrue(room.isLocked());
+    }
+ 
+    @Test
+    void unlockReturnsFalseWhenLockedButRequiredKeyNameIsNull() {
+        // Branch: locked=true, requiredKeyName=null -> the && short-circuits
+        // on the null check and returns false. No existing Room-level test
+        // exercises this branch; InteractionEngineTest covers the behaviour
+        // indirectly but Pitest will still flag the mutant on `!= null`.
+        Room room = new Room("r", "Room", "desc");
+        room.setLocked(true, null);
+ 
+        boolean result = room.unlock("Brass Key");
+ 
+        assertFalse(result);
+        assertTrue(room.isLocked());
+    }
+ 
+    @Test
+    void unlockReturnsFalseWhenSuppliedKeyNameIsNull() {
+        // requiredKeyName != null, but keyName is null -> equalsIgnoreCase(null)
+        // returns false. Exercises the right-hand side of the && without
+        // depending on the InteractionEngine wrapper.
+        Room room = new Room("r", "Room", "desc");
+        room.setLocked(true, "Brass Key");
+ 
+        boolean result = room.unlock(null);
+ 
+        assertFalse(result);
+        assertTrue(room.isLocked());
+    }
 }

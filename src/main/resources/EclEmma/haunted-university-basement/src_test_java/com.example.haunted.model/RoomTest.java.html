@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>RoomTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 10:43:15 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.model</a> &gt; <span class="el_source">RoomTest.java</span></div><h1>RoomTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.model;
+
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+<span class="fc" id="L15">public class RoomTest {</span>
+	private Room room;
+	private Room room2;
+	private Room room3;
+	
+	@BeforeEach
+	public void setup()
+	{
+<span class="fc" id="L23">		room = new Room(&quot;Room1&quot;, &quot;Kitchen&quot;, &quot;Has food&quot;);</span>
+<span class="fc" id="L24">		room2 = new Room(&quot;Room2&quot;, &quot;Dining Room&quot;, &quot;Where we eat&quot;);</span>
+<span class="fc" id="L25">		room3 = new Room(&quot;Room3&quot;, &quot;Living Room&quot;, &quot;Where we hang out&quot;);</span>
+<span class="fc" id="L26">		room.connect(Direction.SOUTH, room2);</span>
+<span class="fc" id="L27">		room.setLocked(true, &quot;Master Key&quot;);</span>
+<span class="fc" id="L28">	}</span>
+	
+	public static List&lt;Item&gt; createLoot()
+	{
+<span class="fc" id="L32">		List&lt;Item&gt; loot = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L33">		loot.add(new Armor(&quot;Iron&quot;, &quot;Medium&quot;, 7));</span>
+<span class="fc" id="L34">		loot.add(new Weapon(&quot;Spear&quot;, &quot;Pointy&quot;, 15));</span>
+<span class="fc" id="L35">		return loot;</span>
+	}
+	
+	@Test
+	public void shouldGetId()
+	{
+<span class="fc" id="L41">		assertEquals(&quot;Room1&quot;, room.getId());</span>
+<span class="fc" id="L42">	}</span>
+
+	@Test
+	public void shouldGetName()
+	{
+<span class="fc" id="L47">		assertEquals(&quot;Kitchen&quot;, room.getName());</span>
+<span class="fc" id="L48">	}</span>
+	
+	@Test
+	public void shouldGetDescription()
+	{
+<span class="fc" id="L53">		assertEquals(&quot;Has food&quot;, room.getDescription());</span>
+<span class="fc" id="L54">	}</span>
+	
+	public static Stream&lt;Arguments&gt; roomConnectCases()
+	{
+<span class="fc" id="L58">		return Stream.of(</span>
+<span class="fc" id="L59">				Arguments.of(Direction.NORTH),</span>
+<span class="fc" id="L60">				Arguments.of(Direction.WEST),</span>
+<span class="fc" id="L61">				Arguments.of(Direction.SOUTH),</span>
+<span class="fc" id="L62">				Arguments.of(Direction.EAST)</span>
+				);
+	}
+	@ParameterizedTest
+	@MethodSource(&quot;roomConnectCases&quot;)
+	public void connectShouldConnectRoom(Direction d)
+	{
+<span class="fc" id="L69">		room2.connect(d, room3);</span>
+		
+<span class="fc" id="L71">		assertEquals(room3, room2.getExit(d));</span>
+<span class="fc" id="L72">	}</span>
+	
+	@Test
+	public void getExitShouldReturnRoom()
+	{
+<span class="fc" id="L77">		assertEquals(room2, room.getExit(Direction.SOUTH));</span>
+<span class="fc" id="L78">	}</span>
+	
+	@Test
+	public void getExitShouldBeEmpty()
+	{
+<span class="fc" id="L83">		assertNull(room3.getExit(Direction.NORTH));</span>
+<span class="fc" id="L84">	}</span>
+	
+	@Test
+	public void getExitsShouldBeFilled()
+	{
+<span class="fc" id="L89">		room.connect(Direction.EAST, room3);</span>
+<span class="fc" id="L90">		Room room4 = new Room(&quot;Room4&quot;, &quot;Bathroom&quot;, &quot;Has toilet&quot;);</span>
+<span class="fc" id="L91">		room.connect(Direction.WEST, room4);</span>
+<span class="fc" id="L92">		Room room5 = new Room(&quot;Room5&quot;, &quot;Bedroom&quot;, &quot;For sleeping&quot;);</span>
+<span class="fc" id="L93">		room.connect(Direction.NORTH, room5);</span>
+		
+<span class="fc" id="L95">		Map&lt;Direction, Room&gt; m = room.getExits();</span>
+		
+<span class="fc" id="L97">		assertEquals(room5, m.get(Direction.NORTH));</span>
+<span class="fc" id="L98">		assertEquals(room4, m.get(Direction.WEST));</span>
+<span class="fc" id="L99">		assertEquals(room3, m.get(Direction.EAST));</span>
+<span class="fc" id="L100">		assertEquals(room2, m.get(Direction.SOUTH));</span>
+<span class="fc" id="L101">	}</span>
+	
+	@Test
+	public void	getExitsShouldBeEmpty()
+	{
+<span class="fc" id="L106">		Map&lt;Direction, Room&gt; m = room3.getExits();</span>
+		
+<span class="fc" id="L108">		assertEquals(null, m.get(Direction.NORTH));</span>
+<span class="fc" id="L109">		assertEquals(null, m.get(Direction.WEST));</span>
+<span class="fc" id="L110">		assertEquals(null, m.get(Direction.EAST));</span>
+<span class="fc" id="L111">		assertEquals(null, m.get(Direction.SOUTH));</span>
+<span class="fc" id="L112">	}</span>
+	
+	public static Stream&lt;Arguments&gt; addItemCases()
+	{
+<span class="fc" id="L116">		return Stream.of(</span>
+<span class="fc" id="L117">				Arguments.of(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5)),</span>
+<span class="fc" id="L118">				Arguments.of(new Weapon(&quot;Axe&quot;, &quot;Chops&quot;, 6)),</span>
+<span class="fc" id="L119">				Arguments.of(new Weapon(&quot;Bow&quot;, &quot;Shoots&quot;, 3))				</span>
+				);
+	}
+	@ParameterizedTest
+	@MethodSource(&quot;addItemCases&quot;)
+	public void itemShouldBeAdded(Item i)
+	{
+<span class="fc" id="L126">		room.addItem(i);</span>
+		
+<span class="fc" id="L128">		assertTrue(room.getItems().contains(i));</span>
+<span class="fc" id="L129">	}</span>
+
+	
+	public static Stream&lt;Arguments&gt; removeValidItemCases()
+	{
+<span class="fc" id="L134">		return Stream.of(</span>
+<span class="fc" id="L135">				Arguments.of(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5)),</span>
+<span class="fc" id="L136">				Arguments.of(new Weapon(&quot;Axe&quot;, &quot;Chops&quot;, 6)),</span>
+<span class="fc" id="L137">				Arguments.of(new Weapon(&quot;Bow&quot;, &quot;Shoots&quot;, 3))				</span>
+				);
+	}
+	@ParameterizedTest
+	@MethodSource(&quot;removeValidItemCases&quot;)
+	public void itemShouldBeRemoved(Item i)
+	{
+<span class="fc" id="L144">		String s = i.getName();</span>
+		
+<span class="fc" id="L146">		room.addItem(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5));</span>
+<span class="fc" id="L147">		room.addItem(new Weapon(&quot;Axe&quot;, &quot;Chops&quot;, 6));</span>
+<span class="fc" id="L148">		room.addItem(new Weapon(&quot;Bow&quot;, &quot;Shoots&quot;, 3));</span>
+		
+<span class="fc" id="L150">		room.removeItemByName(s);</span>
+		
+<span class="fc" id="L152">		assertTrue(room.findItem(s).isEmpty());</span>
+<span class="fc" id="L153">	}</span>
+	
+	@ParameterizedTest
+	@MethodSource(&quot;removeValidItemCases&quot;)
+	public void itemRemovedShouldReturn(Item i)
+	{
+<span class="fc" id="L159">		String s = i.getName();</span>
+		
+<span class="fc" id="L161">		room.addItem(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5));</span>
+<span class="fc" id="L162">		room.addItem(new Weapon(&quot;Axe&quot;, &quot;Chops&quot;, 6));</span>
+<span class="fc" id="L163">		room.addItem(new Weapon(&quot;Bow&quot;, &quot;Shoots&quot;, 3));</span>
+		
+<span class="fc" id="L165">		Item removed = room.removeItemByName(s);</span>
+<span class="fc" id="L166">		assertEquals(s, removed.getName());</span>
+<span class="fc" id="L167">	}</span>
+	
+	@Test
+	public void itemShouldNotBeRemoved()
+	{
+<span class="fc" id="L172">		room.addItem(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5));</span>
+<span class="fc" id="L173">		room.addItem(new Weapon(&quot;Axe&quot;, &quot;Chops&quot;, 6));</span>
+<span class="fc" id="L174">		room.addItem(new Weapon(&quot;Bow&quot;, &quot;Shoots&quot;, 3));</span>
+		
+<span class="fc" id="L176">		assertNull(room.removeItemByName(&quot;Blank&quot;));</span>
+<span class="fc" id="L177">	}</span>
+	
+	public static Stream&lt;Arguments&gt; findValidItemCases()
+	{
+<span class="fc" id="L181">		return Stream.of(</span>
+<span class="fc" id="L182">				Arguments.of(&quot;Sword&quot;),</span>
+<span class="fc" id="L183">				Arguments.of(&quot;Axe&quot;),</span>
+<span class="fc" id="L184">				Arguments.of(&quot;Bow&quot;)				</span>
+				);
+	}
+	@ParameterizedTest
+	@MethodSource(&quot;findValidItemCases&quot;)
+	public void itemShouldBeFound(String s)
+	{
+<span class="fc" id="L191">		room.addItem(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5));</span>
+<span class="fc" id="L192">		room.addItem(new Weapon(&quot;Axe&quot;, &quot;Chops&quot;, 6));</span>
+<span class="fc" id="L193">		room.addItem(new Weapon(&quot;Bow&quot;, &quot;Shoots&quot;, 3));</span>
+		
+<span class="fc" id="L195">		assertTrue(room.findItem(s).isPresent());</span>
+<span class="fc" id="L196">	}</span>
+	
+	@Test
+	public void invalidShouldNotBeFound()
+	{
+<span class="fc" id="L201">		assertTrue(room.findItem(&quot;Ghost item&quot;).isEmpty());</span>
+<span class="fc" id="L202">	}</span>
+	
+	@Test
+	public void itemsShouldBeReturned()
+	{		
+<span class="fc" id="L207">		room.addItem(new Weapon(&quot;Sword&quot;, &quot;Slices&quot;, 5));</span>
+<span class="fc" id="L208">		room.addItem(new Weapon(&quot;Axe&quot;, &quot;Chops&quot;, 6));</span>
+<span class="fc" id="L209">		room.addItem(new Weapon(&quot;Bow&quot;, &quot;Shoots&quot;, 3));</span>
+		
+<span class="fc" id="L211">		assertEquals(3, room.getItems().size());</span>
+<span class="fc" id="L212">	}</span>
+	
+	@Test
+	public void itemsShouldNotBeReturned()
+	{
+<span class="fc" id="L217">		assertEquals(0, room.getItems().size());</span>
+<span class="fc" id="L218">	}</span>
+	
+	public static Stream&lt;Arguments&gt; validMonsterAddCases()
+	{
+<span class="fc" id="L222">		return Stream.of(</span>
+<span class="fc" id="L223">				Arguments.of(new Monster(&quot;Creeper&quot;, 20, 15, 2, createLoot())),</span>
+<span class="fc" id="L224">				Arguments.of(new Monster(&quot;Enderman&quot;, 40, 20, 5, createLoot()))</span>
+				);
+	}
+	@ParameterizedTest
+	@MethodSource(&quot;validMonsterAddCases&quot;)
+	public void shouldAddMonster(Monster m)
+	{
+<span class="fc" id="L231">		room.addMonster(m);</span>
+		
+<span class="fc" id="L233">		assertTrue(room.findMonster(m.getName()).isPresent());</span>
+<span class="fc" id="L234">	}</span>
+	
+	public static Stream&lt;Arguments&gt; validMonsterFindCases()
+	{
+<span class="fc" id="L238">		return Stream.of(</span>
+<span class="fc" id="L239">				Arguments.of(&quot;Creeper&quot;),</span>
+<span class="fc" id="L240">				Arguments.of(&quot;Enderman&quot;)</span>
+				);
+	}
+	@ParameterizedTest
+	@MethodSource(&quot;validMonsterFindCases&quot;)
+	public void shouldFindMonster(String s)
+	{
+<span class="fc" id="L247">		room.addMonster(new Monster(&quot;Creeper&quot;, 20, 15, 2, createLoot()));</span>
+<span class="fc" id="L248">		room.addMonster(new Monster(&quot;Enderman&quot;, 40, 20, 5, createLoot()));</span>
+		
+<span class="fc" id="L250">		assertTrue(room.findMonster(s).isPresent());</span>
+<span class="fc" id="L251">	}</span>
+	
+	@Test
+	public void shouldNotFindMonster()
+	{
+<span class="fc" id="L256">		room.addMonster(new Monster(&quot;Creeper&quot;, 20, 15, 2, createLoot()));</span>
+<span class="fc" id="L257">		room.addMonster(new Monster(&quot;Enderman&quot;, 40, 20, 5, createLoot()));</span>
+		
+<span class="fc" id="L259">		assertTrue(room.findMonster(&quot;&quot;).isEmpty());</span>
+<span class="fc" id="L260">	}</span>
+	
+	@Test
+	public void shouldReturnMonsters()
+	{
+<span class="fc" id="L265">		room.addMonster(new Monster(&quot;Creeper&quot;, 20, 15, 2, createLoot()));</span>
+<span class="fc" id="L266">		room.addMonster(new Monster(&quot;Enderman&quot;, 40, 20, 5, createLoot()));</span>
+		
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">		assertTrue(room.getMonsters().size() == 2);</span>
+<span class="fc" id="L269">	}</span>
+	
+	@Test
+	public void shouldReturnEmpty()
+	{
+<span class="pc bpc" id="L274" title="1 of 2 branches missed.">		assertTrue(room.getMonsters().size() == 0);</span>
+<span class="fc" id="L275">	}</span>
+	
+	@Test
+	public void shouldHaveAlive()
+	{
+<span class="fc" id="L280">		room.addMonster(new Monster(&quot;Creeper&quot;, 20, 15, 2, createLoot()));</span>
+<span class="fc" id="L281">		room.addMonster(new Monster(&quot;Enderman&quot;, 40, 20, 5, createLoot()));</span>
+		
+<span class="fc" id="L283">		assertTrue(room.hasLivingMonsters());</span>
+<span class="fc" id="L284">	}</span>
+	
+	@Test
+	public void shouldNotHaveAlive()
+	{
+<span class="fc" id="L289">		room.addMonster(new Monster(&quot;Creeper&quot;, 20, 15, 2, createLoot()));</span>
+<span class="fc" id="L290">		room.addMonster(new Monster(&quot;Enderman&quot;, 40, 20, 5, createLoot()));</span>
+		
+<span class="fc bfc" id="L292" title="All 2 branches covered.">		for(Monster m : room.getMonsters())</span>
+		{
+<span class="fc" id="L294">			m.takeDamage(1000);</span>
+		}
+		
+<span class="fc" id="L297">		assertFalse(room.hasLivingMonsters());</span>
+<span class="fc" id="L298">	}</span>
+
+	@Test
+	public void shouldBeLocked()
+	{
+<span class="fc" id="L303">		room.unlock(room.getRequiredKeyName());</span>
+<span class="fc" id="L304">		room.setLocked(true, room.getRequiredKeyName());</span>
+<span class="fc" id="L305">		assertEquals(true, room.isLocked());</span>
+<span class="fc" id="L306">	}</span>
+	
+	@Test
+	public void shouldUnlock()
+	{
+<span class="fc" id="L311">		room.setLocked(true, room.getRequiredKeyName());</span>
+<span class="fc" id="L312">		room.unlock(room.getRequiredKeyName());</span>
+<span class="fc" id="L313">		assertEquals(false, room.isLocked());</span>
+<span class="fc" id="L314">	}</span>
+	
+	@Test
+	public void shouldNotUnlock()
+	{
+<span class="fc" id="L319">		room.setLocked(true, &quot;Master Key&quot;);</span>
+<span class="fc" id="L320">		room.unlock(&quot;nope&quot;);</span>
+<span class="fc" id="L321">		assertTrue(room.isLocked());</span>
+<span class="fc" id="L322">	}</span>
+	
+	@Test
+	public void alreadyUnlocked()
+	{
+<span class="fc" id="L327">		room.setLocked(false, room.getRequiredKeyName());</span>
+<span class="fc" id="L328">		room.unlock(&quot;Master Key&quot;);</span>
+<span class="fc" id="L329">		assertEquals(false, room.isLocked());</span>
+<span class="fc" id="L330">	}</span>
+	
+	@Test
+	public void shouldReturnNewKeyName()
+	{
+<span class="fc" id="L335">		room.setLocked(true, &quot;password&quot;);</span>
+<span class="fc" id="L336">		assertEquals(&quot;password&quot;, room.getRequiredKeyName());</span>
+<span class="fc" id="L337">	}</span>
+	
+	@Test
+	public void shouldGetTrap()
+	{
+<span class="fc" id="L342">		Trap t = new Trap(&quot;spikes&quot;, TrapType.ELECTRIC, 20, true, false);</span>
+<span class="fc" id="L343">		room.setTrap(t);</span>
+		
+<span class="fc" id="L345">		assertEquals(t, room.getTrap());</span>
+<span class="fc" id="L346">	}</span>
+	
+	@Test
+	public void shouldChangeTrap()
+	{
+<span class="fc" id="L351">		Trap t = new Trap(&quot;spikes&quot;, TrapType.ELECTRIC, 20, true, false);</span>
+<span class="fc" id="L352">		room.setTrap(t);</span>
+<span class="fc" id="L353">		room.setTrap(new Trap(&quot;poison&quot;, TrapType.STEAM, 10, false, true));</span>
+		
+<span class="fc" id="L355">		assertNotEquals(t, room.getTrap());</span>
+<span class="fc" id="L356">	}</span>
+	
+	@Test
+    void unlockReturnsTrueWhenAlreadyUnlocked() {
+<span class="fc" id="L360">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+        // Default state: locked=false
+<span class="fc" id="L362">        assertTrue(room.unlock(&quot;anything&quot;));</span>
+<span class="fc" id="L363">        assertFalse(room.isLocked());</span>
+<span class="fc" id="L364">    }</span>
+ 
+    @Test
+    void unlockReturnsTrueWithCorrectKey() {
+<span class="fc" id="L368">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L369">        room.setLocked(true, &quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L371">        boolean result = room.unlock(&quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L373">        assertTrue(result);</span>
+<span class="fc" id="L374">        assertFalse(room.isLocked());</span>
+<span class="fc" id="L375">    }</span>
+ 
+    @Test
+    void unlockReturnsTrueWithCorrectKeyDifferentCase() {
+        // Kills the equalsIgnoreCase -&gt; equals mutant on this line.
+<span class="fc" id="L380">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L381">        room.setLocked(true, &quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L383">        boolean result = room.unlock(&quot;brass key&quot;);</span>
+ 
+<span class="fc" id="L385">        assertTrue(result);</span>
+<span class="fc" id="L386">        assertFalse(room.isLocked());</span>
+<span class="fc" id="L387">    }</span>
+ 
+    @Test
+    void unlockReturnsFalseWithWrongKey() {
+<span class="fc" id="L391">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L392">        room.setLocked(true, &quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L394">        boolean result = room.unlock(&quot;Iron Key&quot;);</span>
+ 
+<span class="fc" id="L396">        assertFalse(result);</span>
+<span class="fc" id="L397">        assertTrue(room.isLocked());</span>
+<span class="fc" id="L398">    }</span>
+ 
+    @Test
+    void unlockReturnsFalseWhenLockedButRequiredKeyNameIsNull() {
+        // Branch: locked=true, requiredKeyName=null -&gt; the &amp;&amp; short-circuits
+        // on the null check and returns false. No existing Room-level test
+        // exercises this branch; InteractionEngineTest covers the behaviour
+        // indirectly but Pitest will still flag the mutant on `!= null`.
+<span class="fc" id="L406">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L407">        room.setLocked(true, null);</span>
+ 
+<span class="fc" id="L409">        boolean result = room.unlock(&quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L411">        assertFalse(result);</span>
+<span class="fc" id="L412">        assertTrue(room.isLocked());</span>
+<span class="fc" id="L413">    }</span>
+ 
+    @Test
+    void unlockReturnsFalseWhenSuppliedKeyNameIsNull() {
+        // requiredKeyName != null, but keyName is null -&gt; equalsIgnoreCase(null)
+        // returns false. Exercises the right-hand side of the &amp;&amp; without
+        // depending on the InteractionEngine wrapper.
+<span class="fc" id="L420">        Room room = new Room(&quot;r&quot;, &quot;Room&quot;, &quot;desc&quot;);</span>
+<span class="fc" id="L421">        room.setLocked(true, &quot;Brass Key&quot;);</span>
+ 
+<span class="fc" id="L423">        boolean result = room.unlock(null);</span>
+ 
+<span class="fc" id="L425">        assertFalse(result);</span>
+<span class="fc" id="L426">        assertTrue(room.isLocked());</span>
+<span class="fc" id="L427">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 10:43:15 PM)</div></body></html>

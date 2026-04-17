@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>DamageCalculatorTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 10:43:15 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.rules</a> &gt; <span class="el_source">DamageCalculatorTest.java</span></div><h1>DamageCalculatorTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.rules;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import com.example.haunted.model.BossMonster;
+import com.example.haunted.model.Inventory;
+import com.example.haunted.model.Monster;
+import com.example.haunted.model.Player;
+
+<span class="fc" id="L16">class DamageCalculatorTest {</span>
+
+    @ParameterizedTest
+    @CsvSource({
+        &quot;10, 3, 7&quot;,
+        &quot;5, 5, 1&quot;,
+        &quot;4, 10, 1&quot;
+    })
+    void playerDamageCalculations(int attack, int defense, int expectedDamage) {
+<span class="fc" id="L25">        DamageCalculator calc = new DamageCalculator();</span>
+<span class="fc" id="L26">        Player player = new Player(&quot;Hero&quot;, 50, attack, 2, new Inventory(5));</span>
+<span class="fc" id="L27">        Monster monster = new Monster(&quot;Ghost&quot;, 20, 5, defense, List.of());</span>
+
+<span class="fc" id="L29">        int damage = calc.calculatePlayerDamage(player, monster);</span>
+
+<span class="fc" id="L31">        assertEquals(expectedDamage, damage);</span>
+<span class="fc" id="L32">    }</span>
+
+	
+	@Test
+	void normalMonsterUsesBaseAttack()
+	{
+<span class="fc" id="L38">		DamageCalculator calc = new DamageCalculator();</span>
+<span class="fc" id="L39">		Player player = new Player(&quot;Hero&quot;, 50, 5, 4, new Inventory(5));</span>
+<span class="fc" id="L40">		Monster monster = new Monster(&quot;Ghost&quot;, 20, 8, 2, List.of());</span>
+		
+<span class="fc" id="L42">		int damage = calc.calculateMonsterDamage(monster,player);</span>
+		
+<span class="fc" id="L44">		assertEquals(4, damage);</span>
+<span class="fc" id="L45">	}</span>
+	
+	@Test
+	void monsterDamageNeverDropsBelowOne()
+	{
+<span class="fc" id="L50">		DamageCalculator calc = new DamageCalculator();</span>
+<span class="fc" id="L51">		Player player = new Player(&quot;Hero&quot;, 50, 5, 10, new Inventory(5));</span>
+<span class="fc" id="L52">		Monster monster = new Monster(&quot;Weak ghost&quot;, 20, 5, 2, List.of());</span>
+		
+<span class="fc" id="L54">		int damage = calc.calculateMonsterDamage(monster,player);</span>
+		
+<span class="fc" id="L56">		assertEquals(1, damage);</span>
+<span class="fc" id="L57">	}</span>
+	
+	@Test
+	void bossUsesBaseAttackWhenAboveHalfHealth()
+	{
+<span class="fc" id="L62">		DamageCalculator calc = new DamageCalculator();</span>
+<span class="fc" id="L63">		Player player = new Player(&quot;Hero&quot;, 50, 5, 4, new Inventory(5));</span>
+<span class="fc" id="L64">		BossMonster boss = new BossMonster(&quot;Boss&quot;, 40, 10, 3, List.of(), 3);</span>
+
+		
+<span class="fc" id="L67">		int damage = calc.calculateMonsterDamage(boss,player);</span>
+		
+<span class="fc" id="L69">		assertEquals(6, damage);</span>
+<span class="fc" id="L70">	}</span>
+	
+	@Test
+	void bossUsesEnragedAttackATHalfHealthOrBelow()
+	{
+<span class="fc" id="L75">		DamageCalculator calc = new DamageCalculator();</span>
+<span class="fc" id="L76">		Player player = new Player(&quot;Hero&quot;, 50, 5, 4, new Inventory(5));</span>
+<span class="fc" id="L77">		BossMonster boss = new BossMonster(&quot;Boss&quot;, 40, 10, 3, List.of(), 3);</span>
+
+<span class="fc" id="L79">		boss.takeDamage(20);</span>
+		
+<span class="fc" id="L81">		int damage = calc.calculateMonsterDamage(boss,player);</span>
+		
+<span class="fc" id="L83">		assertEquals(9, damage);</span>
+<span class="fc" id="L84">	}</span>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 10:43:15 PM)</div></body></html>

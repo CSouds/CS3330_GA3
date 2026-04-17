@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>CombatEngineTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">haunted-university-basement (Apr 16, 2026 10:43:15 PM)</a> &gt; <a href="../../index.html" class="el_group">haunted-university-basement</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.example.haunted.engine</a> &gt; <span class="el_source">CombatEngineTest.java</span></div><h1>CombatEngineTest.java</h1><pre class="source lang-java linenums">package com.example.haunted.engine;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import com.example.haunted.model.Inventory;
+import com.example.haunted.model.Player;
+import com.example.haunted.model.Potion;
+import com.example.haunted.model.Quest;
+import com.example.haunted.model.QuestStatus;
+import com.example.haunted.model.Room;
+import com.example.haunted.model.Monster;
+import com.example.haunted.rules.DamageCalculator;
+import com.example.haunted.rules.QuestTracker;
+
+<span class="fc" id="L19">class CombatEngineTest {</span>
+
+    @Test
+    void attackFailsWhenMonsterIsNull() {
+<span class="fc" id="L23">        CombatEngine engine = new CombatEngine(new DamageCalculator(), new QuestTracker());</span>
+<span class="fc" id="L24">        Player player = new Player(&quot;Hero&quot;, 50, 10, 5, new Inventory(5));</span>
+<span class="fc" id="L25">        Quest quest = new Quest(&quot;Escape&quot;, &quot;Recover the gradebook and defeat the phantom.&quot;);</span>
+<span class="fc" id="L26">        Room room = new Room(&quot;start&quot;, &quot;Start&quot;, &quot;starting room&quot;);</span>
+<span class="fc" id="L27">        player.setCurrentRoom(room);</span>
+
+<span class="fc" id="L29">        var result = engine.attack(player, quest, null);</span>
+
+<span class="fc" id="L31">        assertFalse(result.isSuccess());</span>
+<span class="fc" id="L32">        assertEquals(&quot;Monster not found.&quot;, result.getMessage());</span>
+<span class="fc" id="L33">        assertEquals(0, result.getDamageToMonster());</span>
+<span class="fc" id="L34">        assertEquals(0, result.getDamageToPlayer());</span>
+<span class="fc" id="L35">        assertFalse(result.isMonsterDefeated());</span>
+<span class="fc" id="L36">        assertTrue(result.getDroppedItems().isEmpty());</span>
+<span class="fc" id="L37">    }</span>
+
+    @Test
+    void attackFailsWhenPlayerIsAlreadyDefeated() {
+<span class="fc" id="L41">        CombatEngine engine = new CombatEngine(new DamageCalculator(), new QuestTracker());</span>
+<span class="fc" id="L42">        Player player = new Player(&quot;Hero&quot;, 50, 10, 5, new Inventory(5));</span>
+<span class="fc" id="L43">        Quest quest = new Quest(&quot;Escape&quot;, &quot;Recover the gradebook and defeat the phantom.&quot;);</span>
+<span class="fc" id="L44">        Room room = new Room(&quot;start&quot;, &quot;Start&quot;, &quot;starting room&quot;);</span>
+<span class="fc" id="L45">        Monster monster = new Monster(&quot;Ghost&quot;, 20, 6, 2, List.of());</span>
+
+<span class="fc" id="L47">        player.setCurrentRoom(room);</span>
+<span class="fc" id="L48">        player.takeDamage(999);</span>
+
+<span class="fc" id="L50">        var result = engine.attack(player, quest, monster);</span>
+
+<span class="fc" id="L52">        assertFalse(result.isSuccess());</span>
+<span class="fc" id="L53">        assertEquals(&quot;Player is defeated.&quot;, result.getMessage());</span>
+<span class="fc" id="L54">        assertEquals(0, result.getDamageToMonster());</span>
+<span class="fc" id="L55">        assertEquals(0, result.getDamageToPlayer());</span>
+<span class="fc" id="L56">        assertFalse(result.isMonsterDefeated());</span>
+<span class="fc" id="L57">        assertTrue(monster.isAlive());</span>
+<span class="fc" id="L58">    }</span>
+
+    @Test
+    void attackFailsWhenMonsterIsAlreadyDefeated() {
+<span class="fc" id="L62">        CombatEngine engine = new CombatEngine(new DamageCalculator(), new QuestTracker());</span>
+<span class="fc" id="L63">        Player player = new Player(&quot;Hero&quot;, 50, 10, 5, new Inventory(5));</span>
+<span class="fc" id="L64">        Quest quest = new Quest(&quot;Escape&quot;, &quot;Recover the gradebook and defeat the phantom.&quot;);</span>
+<span class="fc" id="L65">        Room room = new Room(&quot;start&quot;, &quot;Start&quot;, &quot;starting room&quot;);</span>
+<span class="fc" id="L66">        Monster monster = new Monster(&quot;Ghost&quot;, 20, 6, 2, List.of());</span>
+
+<span class="fc" id="L68">        player.setCurrentRoom(room);</span>
+<span class="fc" id="L69">        monster.takeDamage(999);</span>
+
+<span class="fc" id="L71">        var result = engine.attack(player, quest, monster);</span>
+
+<span class="fc" id="L73">        assertFalse(result.isSuccess());</span>
+<span class="fc" id="L74">        assertEquals(&quot;Monster is already defeated.&quot;, result.getMessage());</span>
+<span class="fc" id="L75">        assertEquals(0, result.getDamageToMonster());</span>
+<span class="fc" id="L76">        assertEquals(0, result.getDamageToPlayer());</span>
+<span class="fc" id="L77">        assertTrue(result.isMonsterDefeated());</span>
+<span class="fc" id="L78">    }</span>
+
+    @Test
+    void defeatingMonsterDropsLootIntoRoom() {
+<span class="fc" id="L82">        CombatEngine engine = new CombatEngine(new DamageCalculator(), new QuestTracker());</span>
+<span class="fc" id="L83">        Player player = new Player(&quot;Hero&quot;, 50, 10, 5, new Inventory(5));</span>
+<span class="fc" id="L84">        Quest quest = new Quest(&quot;Escape&quot;, &quot;Recover the gradebook and defeat the phantom.&quot;);</span>
+<span class="fc" id="L85">        Room room = new Room(&quot;start&quot;, &quot;Start&quot;, &quot;starting room&quot;);</span>
+<span class="fc" id="L86">        Potion loot = new Potion(&quot;Coffee Potion&quot;, &quot;heals&quot;, 15);</span>
+<span class="fc" id="L87">        Monster monster = new Monster(&quot;Ghost&quot;, 5, 6, 2, List.of(loot));</span>
+
+<span class="fc" id="L89">        player.setCurrentRoom(room);</span>
+
+<span class="fc" id="L91">        var result = engine.attack(player, quest, monster);</span>
+
+<span class="fc" id="L93">        assertTrue(result.isSuccess());</span>
+<span class="fc" id="L94">        assertEquals(&quot;Defeated Ghost.&quot;, result.getMessage());</span>
+<span class="fc" id="L95">        assertEquals(8, result.getDamageToMonster());</span>
+<span class="fc" id="L96">        assertEquals(0, result.getDamageToPlayer());</span>
+<span class="fc" id="L97">        assertTrue(result.isMonsterDefeated());</span>
+<span class="fc" id="L98">        assertEquals(1, result.getDroppedItems().size());</span>
+<span class="fc" id="L99">        assertEquals(&quot;Coffee Potion&quot;, result.getDroppedItems().get(0).getName());</span>
+<span class="fc" id="L100">        assertTrue(room.findItem(&quot;Coffee Potion&quot;).isPresent());</span>
+<span class="fc" id="L101">    }</span>
+
+    @Test
+    void survivingMonsterCounterattacksPlayer() {
+<span class="fc" id="L105">        CombatEngine engine = new CombatEngine(new DamageCalculator(), new QuestTracker());</span>
+<span class="fc" id="L106">        Player player = new Player(&quot;Hero&quot;, 50, 10, 5, new Inventory(5));</span>
+<span class="fc" id="L107">        Quest quest = new Quest(&quot;Escape&quot;, &quot;Recover the gradebook and defeat the phantom.&quot;);</span>
+<span class="fc" id="L108">        Room room = new Room(&quot;start&quot;, &quot;Start&quot;, &quot;starting room&quot;);</span>
+<span class="fc" id="L109">        Monster monster = new Monster(&quot;Ghost&quot;, 20, 9, 2, List.of());</span>
+
+<span class="fc" id="L111">        player.setCurrentRoom(room);</span>
+
+<span class="fc" id="L113">        var result = engine.attack(player, quest, monster);</span>
+
+<span class="fc" id="L115">        assertTrue(result.isSuccess());</span>
+<span class="fc" id="L116">        assertEquals(&quot;Attacked Ghost.&quot;, result.getMessage());</span>
+<span class="fc" id="L117">        assertEquals(8, result.getDamageToMonster());</span>
+<span class="fc" id="L118">        assertEquals(4, result.getDamageToPlayer());</span>
+<span class="fc" id="L119">        assertFalse(result.isMonsterDefeated());</span>
+<span class="fc" id="L120">        assertEquals(46, player.getHealth());</span>
+<span class="fc" id="L121">        assertEquals(12, monster.getHealth());</span>
+<span class="fc" id="L122">        assertTrue(result.getDroppedItems().isEmpty());</span>
+<span class="fc" id="L123">    }</span>
+
+    @Test
+    void defeatingFinalExamPhantomUpdatesQuestProgress() {
+<span class="fc" id="L127">        CombatEngine engine = new CombatEngine(new DamageCalculator(), new QuestTracker());</span>
+<span class="fc" id="L128">        Player player = new Player(&quot;Hero&quot;, 50, 10, 5, new Inventory(5));</span>
+<span class="fc" id="L129">        Quest quest = new Quest(&quot;Escape&quot;, &quot;Recover the gradebook and defeat the phantom.&quot;);</span>
+<span class="fc" id="L130">        Room room = new Room(&quot;start&quot;, &quot;Start&quot;, &quot;starting room&quot;);</span>
+<span class="fc" id="L131">        Monster monster = new Monster(&quot;Final Exam Phantom&quot;, 5, 8, 2, List.of());</span>
+
+<span class="fc" id="L133">        player.setCurrentRoom(room);</span>
+
+<span class="fc" id="L135">        var result = engine.attack(player, quest, monster);</span>
+
+<span class="fc" id="L137">        assertTrue(result.isSuccess());</span>
+<span class="fc" id="L138">        assertTrue(result.isMonsterDefeated());</span>
+<span class="fc" id="L139">        assertTrue(quest.isPhantomDefeated());</span>
+<span class="fc" id="L140">        assertFalse(quest.isComplete());</span>
+<span class="fc" id="L141">        assertEquals(QuestStatus.IN_PROGRESS, quest.getStatus());</span>
+<span class="fc" id="L142">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span>haunted-university-basement (Apr 16, 2026 10:43:15 PM)</div></body></html>
